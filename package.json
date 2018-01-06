@@ -1,0 +1,42 @@
+{
+  "name": "world-geography-data",
+  "version": "1.0.0",
+  "description": "Script merging info about world countries data",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc mocha --opts mocha.opts",
+    "test-watch": "mocha --opts mocha.opts --watch"
+  },
+  "keywords": [
+    "world",
+    "data",
+    "database",
+    "countries",
+    "country",
+    "geography",
+    "language",
+    "territories"
+  ],
+  "author": "Marc Ed Raffalli",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "command-line-args": "^4.0.7",
+    "command-line-usage": "^4.0.2",
+    "debug": "^3.1.0",
+    "git-url-parse": "^7.0.2",
+    "glob": "^7.1.2",
+    "inquirer": "^5.0.0",
+    "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1",
+    "path-exists": "^3.0.0",
+    "rimraf": "^2.6.2",
+    "simple-git": "^1.85.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1",
+    "nyc": "^11.4.1",
+    "sinon": "^4.1.3"
+  }
+}
