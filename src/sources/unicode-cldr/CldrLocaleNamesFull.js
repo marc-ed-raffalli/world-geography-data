@@ -66,7 +66,31 @@ class CldrLocaleNamesFull extends _CldrLocalizedSource {
       .then(data => {
         debug('getTerritoryNames: loaded', locale);
 
-        return data.main[Object.keys(data.main)[0]].localeDisplayNames.territories;
+        const territories = data.main[Object.keys(data.main)[0]].localeDisplayNames.territories,
+          groupRegex = /^[0-9]{3}$/,
+          territoryRegex = /^[A-Z]{2}$/;
+
+        return Object.keys(territories)
+          .reduce((res, key) => {
+            // filter out:
+            // - alt spellings
+            // - potential data irregularity
+
+            res.all[key] = territories[key];
+
+            if (territoryRegex.test(key)) {
+              res.territories[key] = territories[key];
+            }
+            else if (groupRegex.test(key)) {
+              res.groups[key] = territories[key];
+            }
+
+            return res;
+          }, {
+            all: {},
+            territories: {},
+            groups: {}
+          });
       });
   }
 

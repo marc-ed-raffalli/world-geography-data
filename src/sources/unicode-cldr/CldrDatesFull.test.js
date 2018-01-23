@@ -76,6 +76,11 @@ describe('CldrDatesFull', () => {
             Amsterdam: {
               exemplarCity: 'Amsterdam'
             }
+          },
+          noExemplarCity: {
+            Amsterdam: {
+              foo: 'bar'
+            }
           }
         });
 

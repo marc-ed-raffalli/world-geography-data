@@ -1,3 +1,5 @@
+const uniq = require('lodash/uniq');
+
 module.exports = options => {
   if (!options) throw Error('Missing arguments');
 
@@ -15,13 +17,18 @@ module.exports = options => {
   }
 
   const countries = extractMultipleValues(options.countries),
-    locales = extractMultipleValues(options.locales),
+    locales = extractMultipleValues(options.locales) || ['en'],
     sourceDependencies = [];
 
   if (options.country) {
+    sourceDependencies.push('territoryContainment');
 
-    if (options.country.indexOf('languagePopulation') || options.country.indexOf('officialLanguages')) {
+    if (options.country.indexOf('languagePopulation') !== -1 || options.country.indexOf('officialLanguages') !== -1) {
       sourceDependencies.push('language');
+    }
+
+    if (options.country.indexOf('capital') !== -1 && locales.indexOf('en') === -1) {
+      locales.push('en'); // city name matching is using english as base
     }
   }
 
@@ -32,6 +39,6 @@ module.exports = options => {
       iso_a2: countries.filter(str => str.length === 2),
       iso_a3: countries.filter(str => str.length === 3)
     },
-    _targetedLocales: locales ? locales : ['en']
+    _targetedLocales: uniq(locales)
   };
 };

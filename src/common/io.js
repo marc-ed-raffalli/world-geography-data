@@ -11,6 +11,20 @@ const debug = require('debug')('cgd-io'),
     readFile: Promise.promisify(fs.readFile),
     writeFile: Promise.promisify(fs.writeFile),
     readDir: Promise.promisify(fs.readdir)
+  },
+  io = {
+    read,
+    write,
+    dir: {
+      create: mkdir,
+      exists: exists(stat => stat.isDirectory()),
+      remove: rmdir,
+      list
+    },
+    json: {
+      read: readJsonFile,
+      write: writeJsonFile
+    }
   }
 ;
 
@@ -27,7 +41,8 @@ function read(filePath) {
 }
 
 /**
- * Wrapper for fs.writeFile
+ * Wrapper for fs.writeFile.
+ * Will create the directory containing the file if it does not exist
  *
  * @param {String}  filePath
  * @param {String}  data
@@ -36,7 +51,13 @@ function read(filePath) {
 function write(filePath, data) {
   debug('write:', filePath);
 
-  return asyncFs.writeFile(filePath, data, 'utf8');
+  const dirname = path.dirname(filePath),
+    _write = () => asyncFs.writeFile(filePath, data, 'utf8');
+
+  return io.dir.exists(dirname)
+    .then(exists =>
+      exists ? _write() : mkdirp(dirname).then(() => _write())
+    );
 }
 
 /**
@@ -128,17 +149,4 @@ function writeJsonFile(filePath, data) {
 
 //</editor-fold>
 
-module.exports = {
-  read,
-  write,
-  dir: {
-    create: mkdir,
-    exists: exists(stat => stat.isDirectory()),
-    remove: rmdir,
-    list
-  },
-  json: {
-    read: readJsonFile,
-    write: writeJsonFile
-  }
-};
+module.exports = io;

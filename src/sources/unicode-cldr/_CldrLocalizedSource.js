@@ -62,6 +62,12 @@ class CldrLocalizedSource extends GitBasedSource {
       });
   }
 
+  /**
+   *
+   * @param targetedValues
+   * @param targetedLocales
+   * @param valueToGetterMap
+   */
   buildLocalizedExtractionProps(targetedValues, targetedLocales, valueToGetterMap) {
     const supportedValues = Object.keys(valueToGetterMap);
 

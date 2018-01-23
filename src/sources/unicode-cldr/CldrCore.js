@@ -45,7 +45,8 @@ class CldrCore extends GitBasedSource {
         'firstDay',
         'weekendStart',
         'weekendEnd'
-      ]
+      ],
+      _sourceDependencies: ['territoryContainment']
     };
   }
 
@@ -53,7 +54,8 @@ class CldrCore extends GitBasedSource {
     debug('extract:');
 
     return Promise.props({
-      codeMappings: this.getCountryCodesMapping()
+      codeMappings: this.getCountryCodesMapping(),
+      territoryContainment: this.getTerritoryContainments()
     });
   }
 
@@ -84,6 +86,34 @@ class CldrCore extends GitBasedSource {
 
           return res;
         }, base);
+      });
+  }
+
+  /**
+   * Returns values of territoryContainment
+   * without keys like:
+   * - XXX-status-deprecated
+   * - XXX-status-grouping
+   *
+   * @return {Promise}
+   */
+  getTerritoryContainments() {
+    debug('getTerritoryContainments: started');
+
+    const codeMappingsFilePath = path.join(this.git.localPath, 'supplemental/territoryContainment.json');
+
+    return io.json.read(codeMappingsFilePath)
+      .then(data => {
+        const territoryContainment = data.supplemental.territoryContainment;
+
+        return Object.keys(territoryContainment)
+          .reduce((res, key) => {
+            if (key.length === 3 && territoryContainment[key]._contains) {
+              res[key] = territoryContainment[key]._contains;
+            }
+
+            return res;
+          }, {});
       });
   }
 

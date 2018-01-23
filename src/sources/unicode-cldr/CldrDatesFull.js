@@ -69,10 +69,13 @@ class CldrDatesFull extends _CldrLocalizedSource {
             return;
           }
 
-          if (!object) return;
+          // exemplarCity is not always present
+          // prevent recursively decomposing String
+          // e.g. Honolulu
+          if (!object || typeof object === 'string') return;
 
           // zone is the starting object
-          if (key !== 'zone' && object !== undefined && object.exemplarCity) {
+          if (key !== 'zone' && object.exemplarCity) {
             res[key] = object.exemplarCity;
             return;
           }

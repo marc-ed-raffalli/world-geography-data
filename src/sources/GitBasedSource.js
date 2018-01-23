@@ -35,7 +35,7 @@ class GitBasedSource {
     debug('loadData:', this.sourceName);
 
     if (this._load === undefined) {
-      this._load = this.git.initialize()
+      this._load = Promise.resolve(this.git.initialize())
         .then(() => this.git.resetToRemote('origin/master'))
         .tap(() => debug('loadData: done loading', this.sourceName));
     }

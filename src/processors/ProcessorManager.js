@@ -13,7 +13,7 @@ class ProcessorManager {
       orderedPreProcessorClasses = uniqBy(nonUniqueListOfDepsClasses, Klass => Klass.processorId).sort(sortByOrder),
       orderedPostProcessorClasses = postProcessorClasses.sort(sortByOrder);
 
-    this._preProcessors = orderedPreProcessorClasses.map(Klass => new Klass());
+    this._preProcessors = orderedPreProcessorClasses.map(Klass => new Klass(options));
     this._postProcessors = orderedPostProcessorClasses.map(Klass => new Klass(options));
 
     debug('constructor: pre-processors', orderedPreProcessorClasses.map(K => K.processorId),

@@ -37,7 +37,6 @@ describe('CldrLocaleNamesFull', () => {
 
     beforeEach(() => {
       source = new CldrLocaleNamesFull();
-      mockExpectedData = {fo: 'fo en', ba: 'ba en'};
 
       // allow mockJsonReadValue to be updated in the test
       sinon.stub(io.json, 'read').callsFake(() => Promise.resolve(mockJsonReadValue));
@@ -50,11 +49,32 @@ describe('CldrLocaleNamesFull', () => {
     describe('getTerritoryNames', () => {
 
       beforeEach(() => {
+        mockExpectedData = {
+          all: {
+            '001': 'Group 1',
+            '123': 'Group 123',
+            FO: 'fo en',
+            BA: 'ba en',
+            'FO-alt-short': 'fo short en'
+          },
+          territories: {
+            FO: 'fo en',
+            BA: 'ba en'
+          },
+          groups: {
+            '001': 'Group 1',
+            '123': 'Group 123'
+          }
+        };
         mockJsonReadValue = {
           main: {
             en: {
               localeDisplayNames: {
-                territories: mockExpectedData
+                territories: {
+                  ...mockExpectedData.territories,
+                  ...mockExpectedData.groups,
+                  'FO-alt-short': 'fo short en'
+                }
               }
             }
           }
@@ -73,6 +93,7 @@ describe('CldrLocaleNamesFull', () => {
     describe('getLanguageNames', () => {
 
       beforeEach(() => {
+        mockExpectedData = {FO: 'fo en', BA: 'ba en'};
         mockJsonReadValue = {
           main: {
             en: {

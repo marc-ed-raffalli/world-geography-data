@@ -11,10 +11,11 @@ module.exports = args => {
     // data
     {name: 'country', multiple: true},
     {name: 'calendar', multiple: true},
+    {name: 'geometry'},
 
     // output filter
     {name: 'countries', multiple: true},
-    {name: 'locales'},
+    {name: 'locales', multiple: true},
 
     // output destination
     {name: 'destination', alias: 'd', defaultValue: 'dist'},

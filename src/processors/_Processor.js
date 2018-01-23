@@ -21,6 +21,11 @@ class _Processor {
     return Promise.reject('Not implemented');
   }
 
+  /**
+   * Priority order of the processor, defaults to 1.
+   *
+   * @return {number}
+   */
   static get order() {
     return 1;
   }

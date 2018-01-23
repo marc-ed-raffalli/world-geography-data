@@ -111,9 +111,9 @@ describe('Countries', () => {
       beforeEach(() => {
         mockAllCountriesData = [
           // @formatter:off
-          {cca3: 'FOO', area: 1, latlng: [1, 1], borders: ['Foo borders'], capital: 'Foo capital', name: {common: 'Foo'}},
-          {cca3: 'BAR', area: 2, latlng: [2, 2], borders: ['Bar borders'], capital: 'Bar capital', name: {common: 'Bar'}},
-          {cca3: 'BAZ', area: 3, latlng: [3, 3], borders: ['Baz borders'], capital: 'Baz capital', name: {common: 'Baz'}}
+          {cca3: 'FOO', area: 1, latlng: [1, 1], borders: ['Foo borders'], capital: ['Foo capital'], name: {common: 'Foo'}},
+          {cca3: 'BAR', area: 2, latlng: [2, 2], borders: ['Bar borders'], capital: ['Bar capital'], name: {common: 'Bar'}},
+          {cca3: 'BAZ', area: 3, latlng: [3, 3], borders: ['Baz borders'], capital: ['Baz capital A','Baz capital B'], name: {common: 'Baz'}}
           // @formatter:on
         ];
       });

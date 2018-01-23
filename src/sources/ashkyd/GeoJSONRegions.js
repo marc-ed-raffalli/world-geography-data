@@ -39,7 +39,10 @@ class GeoJSONRegions extends GitBasedSource {
 
   static filterOutFeaturesWithMissingISOId(arr) {
     return arr.filter(feature => {
-      if (feature.properties.iso_a2 || feature.properties.iso_a3) return true;
+      const isoA2 = feature.properties.iso_a2,
+        isoA3 = feature.properties.iso_a3;
+
+      if ((isoA2 && isNaN(isoA2)) || (isoA3 && isNaN(isoA3))) return true;
       debug('extract: Warning country without ISO id', feature.properties.name);
     });
   }
