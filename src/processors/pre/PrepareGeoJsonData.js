@@ -1,5 +1,6 @@
-const debug = require('debug')('wgd-processors-pre-SimplifyGeoJsonData'),
+const debug = require('debug')('wgd-processors-pre-PrepareGeoJsonData'),
   Promise = require('bluebird'),
+  path = require('path'),
   _Processor = require('../_Processor');
 
 /**
@@ -9,7 +10,7 @@ const debug = require('debug')('wgd-processors-pre-SimplifyGeoJsonData'),
  * - latlng
  * - area
  */
-class SimplifyGeoJsonData extends _Processor {
+class PrepareGeoJsonData extends _Processor {
 
   /**
    * Removes locale sensitive data from geojson-regions
@@ -21,18 +22,19 @@ class SimplifyGeoJsonData extends _Processor {
   process(data) {
     debug('process: started');
 
-    const dataByIso = data.sources.countries.reduce((dataByIso, country) => {
-      const info = {
-        latlng: country.latlng,
-        area: country.area
-      };
+    const dataByIso = data.sources.countries.countries.reduce((dataByIso, country) => {
+        const info = {
+          latlng: country.latlng,
+          area: country.area
+        };
 
-      return {
-        ...dataByIso,
-        [country.cca2]: info,
-        [country.cca3]: info
-      };
-    }, {});
+        return {
+          ...dataByIso,
+          [country.cca2]: info,
+          [country.cca3]: info
+        };
+      }, {}),
+      flagRequired = this.options.country.indexOf('flag') !== -1;
 
     return Promise.resolve({
       type: 'FeatureCollection',
@@ -52,7 +54,8 @@ class SimplifyGeoJsonData extends _Processor {
               iso_a2: isoA2,
               iso_a3: isoA3,
               latlng: additionalInfo ? additionalInfo.latlng : undefined,
-              area: additionalInfo ? additionalInfo.area : undefined
+              area: additionalInfo ? additionalInfo.area : undefined,
+              flag: flagRequired ? path.join(this.options.countryFlagPath || '', `${isoA3}.svg`) : undefined
             }
           };
         })
@@ -71,4 +74,4 @@ class SimplifyGeoJsonData extends _Processor {
 
 }
 
-module.exports = SimplifyGeoJsonData;
+module.exports = PrepareGeoJsonData;

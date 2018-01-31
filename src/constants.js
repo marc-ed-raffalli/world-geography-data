@@ -22,6 +22,10 @@ module.exports = {
         value: 'name'
       },
       {
+        name: 'Country flag',
+        value: 'flag'
+      },
+      {
         name: 'Currency',
         value: 'currency' // dependency on CLDR numbers
       },

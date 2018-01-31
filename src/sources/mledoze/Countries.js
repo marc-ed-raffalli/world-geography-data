@@ -1,5 +1,6 @@
 const debug = require('debug')('cgd-sources-mledoze-countries'),
   path = require('path'),
+  Promise = require('bluebird'),
   intersection = require('lodash/intersection'),
   cloneDeep = require('lodash/cloneDeep'),
 
@@ -38,6 +39,7 @@ class Countries extends GitBasedSource {
         'area',
         'borders',
         'capital',
+        'flag',
         'latlng'
       ]
     };
@@ -90,33 +92,38 @@ class Countries extends GitBasedSource {
   extract(options) {
     debug('extract: started');
 
-    return this.getAllCountriesData()
-      .then(res => {
-        debug('extract: loaded');
+    function filterCountriesData(res) {
+      const allCountriesWithId = Countries.filterOutCountriesWithMissingISOId(res),
+        extractedData = Countries.buildExtractedCountryData(options, allCountriesWithId);
 
-        const allCountriesWithId = Countries.filterOutCountriesWithMissingISOId(res),
-          extractedData = Countries.buildExtractedCountryData(options, allCountriesWithId);
+      if (!options._filteredCountries) {
+        return extractedData;
+      }
 
-        if (!options._filteredCountries) {
-          return extractedData;
-        }
+      debug('extract: filtering selected countries');
+      // improves perf by removing items already found
+      // prevents side effects, preserves the original array
+      const filteredCountries = cloneDeep(options._filteredCountries),
+        removeIdFromArrayIfPresent = (country, keyUsedAsId, arr) => {
+          return country[keyUsedAsId] && arrayUtils.removeIfPresent(country[keyUsedAsId], arr);
+        },
+        isInSelection = country => {
+          if (removeIdFromArrayIfPresent(country, 'cca2', filteredCountries.iso_a2)
+            || removeIdFromArrayIfPresent(country, 'cca3', filteredCountries.iso_a3)) {
+            return true;
+          }
+        };
 
-        debug('extract: filtering selected countries');
-        // improves perf by removing items already found
-        // prevents side effects, preserves the original array
-        const filteredCountries = cloneDeep(options._filteredCountries),
-          removeIdFromArrayIfPresent = (country, keyUsedAsId, arr) => {
-            return country[keyUsedAsId] && arrayUtils.removeIfPresent(country[keyUsedAsId], arr);
-          },
-          isInSelection = country => {
-            if (removeIdFromArrayIfPresent(country, 'cca2', filteredCountries.iso_a2)
-              || removeIdFromArrayIfPresent(country, 'cca3', filteredCountries.iso_a3)) {
-              return true;
-            }
-          };
+      return extractedData.filter(isInSelection);
+    }
 
-        return extractedData.filter(isInSelection);
-      });
+    // TODO implement filter for flags based on _filteredCountries
+
+    return Promise.props({
+      countries: this.getAllCountriesData().then(filterCountriesData),
+      flags: this.getAllCountriesFlags()
+    })
+      .tap(() => debug('extract: done'));
   }
 
   /**
@@ -125,6 +132,21 @@ class Countries extends GitBasedSource {
   getAllCountriesData() {
     const dataFilePath = path.join(this.git.localPath, 'dist/countries.json');
     return io.json.read(dataFilePath);
+  }
+
+  /**
+   * @return {Promise}
+   */
+  getAllCountriesFlags() {
+    const flagDir = path.join(this.git.localPath, 'data');
+
+    return io.dir.list(flagDir, '**.svg')
+      .then(list =>
+        list.reduce((flagByIso2, flagPath) => ({
+          ...flagByIso2,
+          [path.basename(flagPath, '.svg').toLocaleUpperCase()]: path.join(flagDir, flagPath)
+        }), {})
+      );
   }
 
 }

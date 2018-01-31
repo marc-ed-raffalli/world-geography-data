@@ -5,6 +5,7 @@ const expect = require('chai').expect,
   GeoJsonByContinent = require('../pre/GeoJsonByContinent'),
   LocalizedCountryDataByIsoByContinentByLocale = require('../pre/LocalizedCountryDataByIsoByContinentByLocale'),
   LocalizedLanguageNameByLocaleCode = require('../pre/LocalizedLanguageNameByLocaleCode'),
+  LocalizedCountryDataByLocaleCode = require('../pre/LocalizedCountryDataByLocaleCode'),
   GeoGame = require('./GeoGame');
 
 describe('GeoGame', () => {
@@ -226,6 +227,56 @@ describe('GeoGame', () => {
         .then(() => {
           expect(io.json.write.calledWithExactly(path.join(expectedPath, 'foo-bar.json'), expectedDataByContinentIso['001'])).to.be.true;
           expect(io.json.write.calledWithExactly(path.join(expectedPath, 'baz.json'), expectedDataByContinentIso['002'])).to.be.true;
+        });
+    });
+
+  });
+
+  describe('outputFlags', () => {
+
+    beforeEach(() => {
+      sinon.stub(io, 'copy').resolves();
+    });
+
+    afterEach(() => {
+      io.copy.restore();
+    });
+
+    it('output all flags to dist/geo-game/flags/{iso_a2}.svg', () => {
+      const expectedPath = path.join('dist', 'geo-game', 'flags'),
+        flags = [
+          'some/path/to/aaa.svg',
+          'some/path/to/bbb.svg',
+          'some/path/to/ccc.svg'
+        ];
+
+      return processor.outputFlags({
+        sources: {
+          'cldr-core': {
+            codeMappings: {
+              isoToAlpha3: {
+                AA: 'AAA',
+                BB: 'BBB'
+              }
+            }
+          },
+          countries: {
+            flags: {
+              AAA: flags[0],
+              BBB: flags[1],
+              CCC: flags[2]
+            }
+          }
+        },
+        processors: {
+          [LocalizedCountryDataByLocaleCode.processorId]: {
+            en: {AA: 'country Aa en', BB: 'country Bb en', CC: 'country Cc en'}
+          }
+        }
+      })
+        .then(() => {
+          expect(io.copy.calledWithExactly(flags[0], path.join(expectedPath, 'AA.svg')));
+          expect(io.copy.calledWithExactly(flags[1], path.join(expectedPath, 'BB.svg')));
         });
     });
 

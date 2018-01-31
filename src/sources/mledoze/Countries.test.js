@@ -49,7 +49,7 @@ describe('Countries', () => {
 
       return source.extract(options)
         .then(res => {
-          expect(res).to.deep.equal(mockAllCountriesData);
+          expect(res.countries).to.deep.equal(mockAllCountriesData);
           expect(source.getAllCountriesData.calledOnce).to.be.true;
         });
     });
@@ -67,7 +67,7 @@ describe('Countries', () => {
 
       return source.extract(options)
         .then(res => {
-          expect(res).to.deep.equal([
+          expect(res.countries).to.deep.equal([
             {cca2: 'FO', cca3: 'FOO'},
             {cca2: 'BA', cca3: 'BAR'}
           ]);
@@ -84,7 +84,7 @@ describe('Countries', () => {
 
       return source.extract(options)
         .then(res => {
-          expect(res).to.deep.equal([
+          expect(res.countries).to.deep.equal([
             {cca2: 'FO', cca3: 'FOO'},
             {cca2: 'BA', cca3: 'BAR'}
           ]);
@@ -124,7 +124,7 @@ describe('Countries', () => {
 
           return source.extract(options)
             .then(res => {
-              expect(res).to.deep.equal(expectedOutput);
+              expect(res.countries).to.deep.equal(expectedOutput);
             });
         });
       }

@@ -18,6 +18,7 @@ module.exports = args => {
     {name: 'locales', multiple: true},
 
     // output destination
+    {name: 'countryFlagPath'},
     {name: 'destination', alias: 'd', defaultValue: 'dist'},
     {name: 'processors', alias: 'p', multiple: true, defaultValue: []}
   ], {argv: args});

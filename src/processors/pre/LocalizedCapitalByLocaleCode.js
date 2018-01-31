@@ -13,7 +13,7 @@ class LocalizedCapitalByLocaleCode extends _Processor {
     const localizedCapitalByIsoByLocale = this.options._targetedLocales
       .reduce((capitalByLocaleByIso, locale) => {
         capitalByLocaleByIso[locale] = LocalizedCapitalByLocaleCode.mapLocalizedCityNameByCountryIso(
-          data.sources.countries,
+          data.sources.countries.countries,
           data.sources['cldr-dates-full'].capital,
           locale
         );

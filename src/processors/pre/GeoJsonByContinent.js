@@ -1,6 +1,6 @@
 const debug = require('debug')('wgd-processors-pre-GeoJsonByContinent'),
   Promise = require('bluebird'),
-  SimplifyGeoJsonData = require('./SimplifyGeoJsonData'),
+  PrepareGeoJsonData = require('./PrepareGeoJsonData'),
   MapTerritoryContainmentByIso = require('./MapTerritoryContainmentByIso'),
   _Processor = require('../_Processor');
 
@@ -14,7 +14,7 @@ class GeoJsonByContinent extends _Processor {
     debug('process: started');
 
     const territoryContainmentByCountryIso = data.processors[MapTerritoryContainmentByIso.processorId],
-      geoJsonData = data.processors[SimplifyGeoJsonData.processorId];
+      geoJsonData = data.processors[PrepareGeoJsonData.processorId];
 
     return Promise.resolve(
       geoJsonData.features.reduce((featuresByContinent, feature) => {
@@ -46,7 +46,7 @@ class GeoJsonByContinent extends _Processor {
    * @return {number}
    */
   static get order() {
-    return SimplifyGeoJsonData.order + 1;
+    return PrepareGeoJsonData.order + 1;
   }
 
   static get processorId() {

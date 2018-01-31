@@ -1,7 +1,7 @@
 const debug = require('debug')('wgd-processors-pre-FilterOutCountriesWithoutGeometry'),
   Promise = require('bluebird'),
   LocalizedCountryDataByLocaleCode = require('./LocalizedCountryDataByLocaleCode'),
-  SimplifyGeoJsonData = require('./SimplifyGeoJsonData'),
+  PrepareGeoJsonData = require('./PrepareGeoJsonData'),
   _Processor = require('../_Processor');
 
 class FilterOutCountriesWithoutGeometry extends _Processor {
@@ -15,7 +15,7 @@ class FilterOutCountriesWithoutGeometry extends _Processor {
 
     const
       countryDataByIsoByLocale = data.processors[LocalizedCountryDataByLocaleCode.processorId],
-      countryGeometryByIso2 = data.processors[SimplifyGeoJsonData.processorId].features
+      countryGeometryByIso2 = data.processors[PrepareGeoJsonData.processorId].features
         .reduce((geoByIso, feature) => ({...geoByIso, [feature.properties.iso_a2]: true}), {});
 
     function reduceKeepCountriesWithGeometry(countriesByIso) {
@@ -46,7 +46,7 @@ class FilterOutCountriesWithoutGeometry extends _Processor {
    * @return {number}
    */
   static get order() {
-    return LocalizedCountryDataByLocaleCode.order + SimplifyGeoJsonData.order;
+    return LocalizedCountryDataByLocaleCode.order + PrepareGeoJsonData.order;
   }
 }
 

@@ -16,12 +16,14 @@ describe('LocalizedCapitalByLocaleCode', () => {
     it('returns localized city names', () => {
       return processor.process({
         sources: {
-          countries: [
-            {cca2: 'FO', capital: {en: ['capital Foo en']}, name: {common: 'Foo'}},
-            {cca2: 'BR', capital: {en: ['capital Bar en']}, name: {common: 'Bar'}},
-            {cca2: 'BZ', capital: {en: ['capital Baz A en', 'capital Baz B en']}, name: {common: 'Baz'}},
-            {capital: {en: ['no cca2 branch']}, name: {common: 'cca2 missing'}}
-          ],
+          countries: {
+            countries: [
+              {cca2: 'FO', capital: {en: ['capital Foo en']}, name: {common: 'Foo'}},
+              {cca2: 'BR', capital: {en: ['capital Bar en']}, name: {common: 'Bar'}},
+              {cca2: 'BZ', capital: {en: ['capital Baz A en', 'capital Baz B en']}, name: {common: 'Baz'}},
+              {capital: {en: ['no cca2 branch']}, name: {common: 'cca2 missing'}}
+            ]
+          },
           'cldr-dates-full': {
             capital: {
               en: {cityFoo: 'capital Foo en', cityBaz: 'capital Baz B en'}, // bar missing for en fallback

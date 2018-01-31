@@ -1,5 +1,5 @@
 const expect = require('chai').expect,
-  SimplifyGeoJsonData = require('./SimplifyGeoJsonData'),
+  PrepareGeoJsonData = require('./PrepareGeoJsonData'),
   LocalizedCountryDataByLocaleCode = require('./LocalizedCountryDataByLocaleCode'),
   FilterOutCountriesWithoutGeometry = require('./FilterOutCountriesWithoutGeometry');
 
@@ -16,7 +16,7 @@ describe('FilterOutCountriesWithoutGeometry', () => {
     it('returns countries with geometry', () => {
       return processor.process({
         processors: {
-          [SimplifyGeoJsonData.processorId]: {
+          [PrepareGeoJsonData.processorId]: {
             type: 'FeatureCollection',
             features: [{
               type: 'Feature',

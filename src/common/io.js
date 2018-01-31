@@ -3,6 +3,7 @@ const debug = require('debug')('cgd-io'),
   path = require('path'),
   pathExists = require('path-exists'),
   Promise = require('bluebird'),
+  fileCopy = require('filecopy'),
   glob = Promise.promisify(require('glob')),
   mkdirp = Promise.promisify(require('mkdirp')),
   rimraf = Promise.promisify(require('rimraf')),
@@ -15,6 +16,7 @@ const debug = require('debug')('cgd-io'),
   io = {
     read,
     write,
+    copy,
     dir: {
       create: mkdir,
       exists: exists(stat => stat.isDirectory()),
@@ -80,6 +82,12 @@ function exists(test) {
         debug('exists: error for path', path, err);
         throw err;
       });
+}
+
+function copy(source, dest) {
+  debug('copy', source, 'to', dest);
+
+  return fileCopy(source, dest, {mkdirp: true});
 }
 
 /**

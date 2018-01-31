@@ -7,7 +7,7 @@ const debug = require('debug')('wgd-processors-GeoGame'),
 
   MapTerritoryContainmentByIso = require('../pre/MapTerritoryContainmentByIso'),
   FilterOutCountriesWithoutGeometry = require('../pre/FilterOutCountriesWithoutGeometry'),
-  SimplifyGeoJsonData = require('../pre/SimplifyGeoJsonData'),
+  PrepareGeoJsonData = require('../pre/PrepareGeoJsonData'),
   GeoJsonByContinent = require('../pre/GeoJsonByContinent'),
   LocalizedLanguageNameByLocaleCode = require('../pre/LocalizedLanguageNameByLocaleCode'),
   LocalizedCapitalByLocaleCode = require('../pre/LocalizedCapitalByLocaleCode'),
@@ -29,12 +29,18 @@ class GeoGame extends OutputProcessor {
   process(data) {
     debug('process: started');
 
-    return Promise.all([
+    const operations = [
       this.outputLanguagesMappedByLocale(data),
       this.outputContinentByLocale(data),
       this.outputLocalizedDataByLocaleByContinent(data),
       this.outputGeometry(data)
-    ])
+    ];
+
+    if (this.options.country.indexOf('flag') !== -1) {
+      operations.push(this.outputFlags(data));
+    }
+
+    return Promise.all(operations)
       .tap(() => debug('process: done'))
       .catch(err => debug('process: error', err));
   }
@@ -144,6 +150,31 @@ class GeoGame extends OutputProcessor {
       .tap(() => debug('outputGeometry: done'));
   }
 
+  outputFlags(data) {
+    debug('outputFlags: started');
+    const flagsDirPath = path.join(this.outputPath, 'flags'),
+      isoToAlpha3 = data.sources['cldr-core'].codeMappings.isoToAlpha3,
+      listOfCountryIso = Object.keys(data.processors[LocalizedCountryDataByLocaleCode.processorId].en),
+      copyPromises = [];
+
+    for (let i = 0; i < listOfCountryIso.length; i++) {
+      const countryA3 = isoToAlpha3[listOfCountryIso[i]],
+        flagPath = countryA3 ? data.sources.countries.flags[countryA3] : undefined;
+
+      if (!flagPath) {
+        debug('outputFlags: flag not found for', countryA3, listOfCountryIso[i]);
+        continue;
+      }
+
+      copyPromises.push(
+        io.copy(flagPath, path.join(flagsDirPath, `${countryA3}.svg`))
+      );
+    }
+
+    return Promise.all(copyPromises)
+      .tap(() => debug('outputFlags: done'));
+  }
+
   static get processorId() {
     return 'geo-game';
   }
@@ -156,7 +187,7 @@ class GeoGame extends OutputProcessor {
       LocalizedCountryDataByLocaleCode,
       LocalizedCountryDataByIsoByContinentByLocale,
 
-      SimplifyGeoJsonData,
+      PrepareGeoJsonData,
       FilterOutCountriesWithoutGeometry,
       GeoJsonByContinent
     ];
