@@ -33,6 +33,7 @@ class GeoGame extends OutputProcessor {
       this.outputLanguagesMappedByLocale(data),
       this.outputContinentByLocale(data),
       this.outputLocalizedDataByLocaleByContinent(data),
+      this.outputLocalizationStatus(data),
       this.outputGeometry(data)
     ];
 
@@ -58,6 +59,66 @@ class GeoGame extends OutputProcessor {
     debug('outputLanguagesMappedByLocale: writing locales to', localesFilePath);
 
     return io.json.write(localesFilePath, data.processors[LocalizedLanguageNameByLocaleCode.processorId]);
+  }
+
+  // quick hack to compute the translation status for the locales
+  outputLocalizationStatus(data) {
+    const localizationStatusFilePath = path.join(this.outputPath, 'status.json'),
+      dataByIsoByContinentByLocale = data.processors[LocalizedCountryDataByIsoByContinentByLocale.processorId],
+      namesByIso = data.sources['cldr-localenames-full'].name.en.groups,
+      continentKeyByIso = Object.keys(dataByIsoByContinentByLocale.en)
+        .reduce((res, continentIso) => ({
+          ...res,
+          [continentIso]: dashify(namesByIso[continentIso], {condense: true})
+        }), {}),
+
+      localizationStatusByContinentByLocale = {},
+      computeContinentLocalizationStatus = (localizedContinentData, continentIso) => {
+        const isoKeys = Object.keys(localizedContinentData),
+          status = isoKeys
+            .reduce((status, isoKey) => ({
+              capital: localizedContinentData[isoKey].capital ? status.capital + 1 : status.capital
+            }), {capital: 0});
+
+        status.countryName = isoKeys.length; // straight...
+
+        if (localizationStatusByContinentByLocale.en) {
+          const enStatus = localizationStatusByContinentByLocale.en[continentKeyByIso[continentIso]];
+
+          status.capitalPct = Math.round(100 / enStatus.capital * status.capital);
+          status.countryNamePct = Math.round(100 / enStatus.countryName * status.countryName);
+          status.capitalMissing = enStatus.capital - status.capital;
+
+          status.table = {
+            countryName: [status.countryName, status.countryNamePct],
+            capital: [status.capital, status.capitalPct, status.capitalMissing]
+          };
+        }
+
+        return status;
+      },
+      computeLocaleStatus = dataByIsoByContinent => {
+        const res = Object.keys(dataByIsoByContinent)
+          .reduce((statusByContinent, continentIso) => ({
+            ...statusByContinent,
+            [continentKeyByIso[continentIso]]: computeContinentLocalizationStatus(dataByIsoByContinent[continentIso], continentIso)
+          }), {});
+
+        return res;
+      };
+
+    debug('outputLocalizationStatus: writing status to', localizationStatusFilePath);
+
+    localizationStatusByContinentByLocale.en = computeLocaleStatus(dataByIsoByContinentByLocale.en);
+
+    const status = Object.keys(dataByIsoByContinentByLocale)
+      .filter(locale => locale !== 'en') // en used as reference data, do not compute twice
+      .reduce((statusByLocale, locale) => ({
+        ...statusByLocale,
+        [locale]: computeLocaleStatus(dataByIsoByContinentByLocale[locale])
+      }), localizationStatusByContinentByLocale);
+
+    return io.json.write(localizationStatusFilePath, status);
   }
 
   /**
