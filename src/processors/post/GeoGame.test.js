@@ -177,7 +177,7 @@ describe('GeoGame', () => {
 
   });
 
-  describe('outputGeometry', () => {
+  describe('outputGeoJson', () => {
 
     it('writes file for each continent to dist/geo-game/geometry/{continent-name}.json', () => {
       const expectedPath = path.join('dist', 'geo-game', 'geo-json'),
@@ -223,7 +223,7 @@ describe('GeoGame', () => {
 
       sinon.stub(io.json, 'write').resolves();
 
-      return processor.outputGeometry(data)
+      return processor.outputGeoJson(data)
         .then(() => {
           expect(io.json.write.calledWithExactly(path.join(expectedPath, 'foo-bar.json'), expectedDataByContinentIso['001'])).to.be.true;
           expect(io.json.write.calledWithExactly(path.join(expectedPath, 'baz.json'), expectedDataByContinentIso['002'])).to.be.true;

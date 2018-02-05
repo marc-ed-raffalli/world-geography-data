@@ -132,10 +132,16 @@ https://github.com/unicode-cldr/cldr-numbers-full.git
 
 ## Output
 
+## GeoGame
 
-## TODO
+Output the data for the [World Geography Game](https://github.com/marc-ed-raffalli/geo-game) project.
 
-- [x] add support for locale fallback
+- List of languages with translated name
+- List of translated continent name by locale
+- Translated game data (country name, capital) by continent by locale
+- Status (count, pct, missing) of the support of one language compared to English   
+- GeoJson files (generic data, nothing translated)
+
 
 ## Notes
 

@@ -34,7 +34,7 @@ class GeoGame extends OutputProcessor {
       this.outputContinentByLocale(data),
       this.outputLocalizedDataByLocaleByContinent(data),
       this.outputLocalizationStatus(data),
-      this.outputGeometry(data)
+      this.outputGeoJson(data)
     ];
 
     if (this.options.country.indexOf('flag') !== -1) {
@@ -196,7 +196,7 @@ class GeoGame extends OutputProcessor {
    * @param {Object} data
    * @return {Promise}
    */
-  outputGeometry(data) {
+  outputGeoJson(data) {
     const featuresByContinent = data.processors[GeoJsonByContinent.processorId],
       namesByIso = data.sources['cldr-localenames-full'].name.en.groups;
 
@@ -208,7 +208,7 @@ class GeoGame extends OutputProcessor {
           return io.json.write(path.join(this.outputPath, 'geo-json', fileName), featuresByContinent[continentIso]);
         })
     )
-      .tap(() => debug('outputGeometry: done'));
+      .tap(() => debug('outputGeoJson: done'));
   }
 
   outputFlags(data) {
